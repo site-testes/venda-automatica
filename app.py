@@ -45,9 +45,21 @@ with st.sidebar:
     st.header("Configuração")
     api_key = st.text_input("API Key", type="password")
     
-    # DEBUG: Mostrar versão da biblioteca
     st.caption(f"Versão da Lib Google: {genai.__version__}")
-    st.caption("Se for menor que 0.7.2, o erro vai continuar.")
+    
+    # DIAGNÓSTICO
+    if st.button("🔍 Diagnóstico de Erro"):
+        if not api_key:
+            st.error("Coloque a API Key primeiro.")
+        else:
+            try:
+                genai.configure(api_key=api_key)
+                st.write("Modelos Disponíveis para sua Chave:")
+                for m in genai.list_models():
+                    if 'generateContent' in m.supported_generation_methods:
+                        st.code(m.name)
+            except Exception as e:
+                st.error(f"Erro ao listar modelos: {e}")
 
 # Layout Principal
 st.title("Relatório de Vendas")
@@ -80,16 +92,30 @@ if st.button("PROCESSAR DADOS"):
         try:
             genai.configure(api_key=api_key)
             
-            # TENTATIVA DE MODELOS (Fallback)
-            model_name = 'gemini-1.5-flash'
-            try:
-                model = genai.GenerativeModel(model_name)
-            except:
-                model_name = 'gemini-1.5-flash-001' # Tenta versão específica
-                model = genai.GenerativeModel(model_name)
+            # TENTATIVA DE MODELOS (Fallback Robusto)
+            model = None
+            errors = []
             
-            # Se ainda der erro, o try/except principal pega
+            # Lista de modelos para tentar (do mais novo para o mais antigo)
+            models_to_try = [
+                'gemini-1.5-flash',
+                'gemini-1.5-flash-latest',
+                'gemini-1.5-pro',
+                'gemini-pro-vision' # Modelo antigo que aceita imagem
+            ]
             
+            for m_name in models_to_try:
+                try:
+                    # Teste rápido de inicialização
+                    model = genai.GenerativeModel(m_name)
+                    break # Se não der erro na instanciação, usa esse (o erro real vem no generate, mas vamos tentar)
+                except:
+                    continue
+            
+            # Se não instanciou nenhum, volta pro padrão
+            if not model:
+                 model = genai.GenerativeModel('gemini-1.5-flash')
+
             image_painel = Image.open(uploaded_file_painel)
             image_cupom = Image.open(uploaded_file_cupom)
             
@@ -137,10 +163,18 @@ if st.button("PROCESSAR DADOS"):
             Madrugada B ✅ D/I✅ D/C ✅ Contagem✅
             """
             
-            with st.spinner(f'Gerando com modelo {model_name}...'):
-                response = model.generate_content([prompt, image_painel, image_cupom])
-                st.code(response.text, language='markdown')
+            with st.spinner(f'Gerando relatório...'):
+                # Tenta gerar. Se falhar, tenta o próximo modelo da lista manualmente
+                try:
+                    response = model.generate_content([prompt, image_painel, image_cupom])
+                    st.code(response.text, language='markdown')
+                except Exception as e:
+                    # Se falhar no generate, tenta o fallback final: gemini-pro-vision
+                    st.warning(f"Tentativa com modelo principal falhou: {e}. Tentando modelo de backup...")
+                    model_backup = genai.GenerativeModel('gemini-pro-vision')
+                    response = model_backup.generate_content([prompt, image_painel, image_cupom])
+                    st.code(response.text, language='markdown')
 
         except Exception as e:
             st.error(f"Erro Fatal: {e}")
-            st.warning("Dica: Verifique se sua API Key está correta e se o arquivo requirements.txt no GitHub tem 'google-generativeai>=0.7.2'")
+            st.warning("Use o botão de Diagnóstico na barra lateral para ver quais modelos sua chave aceita.")

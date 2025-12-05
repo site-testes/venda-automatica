@@ -44,6 +44,10 @@ st.markdown("""
 with st.sidebar:
     st.header("Configuração")
     api_key = st.text_input("API Key", type="password")
+    
+    # DEBUG: Mostrar versão da biblioteca
+    st.caption(f"Versão da Lib Google: {genai.__version__}")
+    st.caption("Se for menor que 0.7.2, o erro vai continuar.")
 
 # Layout Principal
 st.title("Relatório de Vendas")
@@ -56,8 +60,6 @@ with st.container():
         meta_dia = st.text_input("Meta do Dia (R$)", placeholder="0.00")
     
     with col2:
-        # Usando expander para deixar o upload mais discreto se quiser, 
-        # mas para "bem apresentável" vamos deixar exposto mas limpo.
         col_up1, col_up2 = st.columns(2)
         with col_up1:
             uploaded_file_painel = st.file_uploader("Painel de Metas", type=["jpg", "png", "jpeg"])
@@ -77,7 +79,16 @@ if st.button("PROCESSAR DADOS"):
     else:
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            
+            # TENTATIVA DE MODELOS (Fallback)
+            model_name = 'gemini-1.5-flash'
+            try:
+                model = genai.GenerativeModel(model_name)
+            except:
+                model_name = 'gemini-1.5-flash-001' # Tenta versão específica
+                model = genai.GenerativeModel(model_name)
+            
+            # Se ainda der erro, o try/except principal pega
             
             image_painel = Image.open(uploaded_file_painel)
             image_cupom = Image.open(uploaded_file_cupom)
@@ -126,9 +137,10 @@ if st.button("PROCESSAR DADOS"):
             Madrugada B ✅ D/I✅ D/C ✅ Contagem✅
             """
             
-            with st.spinner('Gerando...'):
+            with st.spinner(f'Gerando com modelo {model_name}...'):
                 response = model.generate_content([prompt, image_painel, image_cupom])
                 st.code(response.text, language='markdown')
 
         except Exception as e:
-            st.error(f"Erro: {e}")
+            st.error(f"Erro Fatal: {e}")
+            st.warning("Dica: Verifique se sua API Key está correta e se o arquivo requirements.txt no GitHub tem 'google-generativeai>=0.7.2'")

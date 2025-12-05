@@ -92,29 +92,41 @@ if st.button("PROCESSAR DADOS"):
         try:
             genai.configure(api_key=api_key)
             
-            # TENTATIVA DE MODELOS (Fallback Robusto)
-            model = None
-            errors = []
+            # SELEÇÃO DINÂMICA DE MODELO
+            # Em vez de adivinhar, vamos perguntar pra API qual modelo ela tem.
+            active_model_name = None
             
-            # Lista de modelos para tentar (do mais novo para o mais antigo)
-            models_to_try = [
-                'gemini-1.5-flash',
-                'gemini-1.5-flash-latest',
-                'gemini-1.5-pro',
-                'gemini-pro-vision' # Modelo antigo que aceita imagem
-            ]
-            
-            for m_name in models_to_try:
-                try:
-                    # Teste rápido de inicialização
-                    model = genai.GenerativeModel(m_name)
-                    break # Se não der erro na instanciação, usa esse (o erro real vem no generate, mas vamos tentar)
-                except:
-                    continue
-            
-            # Se não instanciou nenhum, volta pro padrão
-            if not model:
-                 model = genai.GenerativeModel('gemini-1.5-flash')
+            try:
+                # Procura o primeiro modelo Flash ou Pro disponível na conta do usuário
+                for m in genai.list_models():
+                    if 'generateContent' in m.supported_generation_methods:
+                        if 'flash' in m.name.lower():
+                            active_model_name = m.name
+                            break
+                
+                # Se não achou flash, tenta pro
+                if not active_model_name:
+                    for m in genai.list_models():
+                        if 'generateContent' in m.supported_generation_methods:
+                            if 'pro' in m.name.lower():
+                                active_model_name = m.name
+                                break
+                
+                # Se não achou nada específico, pega o primeiro que serve
+                if not active_model_name:
+                     for m in genai.list_models():
+                        if 'generateContent' in m.supported_generation_methods:
+                            active_model_name = m.name
+                            break
+            except Exception as e:
+                st.warning(f"Não foi possível listar modelos automaticamente: {e}. Tentando padrão...")
+                active_model_name = 'gemini-1.5-flash'
+
+            if not active_model_name:
+                st.error("Nenhum modelo compatível encontrado na sua conta Google.")
+                st.stop()
+
+            model = genai.GenerativeModel(active_model_name)
 
             image_painel = Image.open(uploaded_file_painel)
             image_cupom = Image.open(uploaded_file_cupom)
@@ -163,18 +175,10 @@ if st.button("PROCESSAR DADOS"):
             Madrugada B ✅ D/I✅ D/C ✅ Contagem✅
             """
             
-            with st.spinner(f'Gerando relatório...'):
-                # Tenta gerar. Se falhar, tenta o próximo modelo da lista manualmente
-                try:
-                    response = model.generate_content([prompt, image_painel, image_cupom])
-                    st.code(response.text, language='markdown')
-                except Exception as e:
-                    # Se falhar no generate, tenta o fallback final: gemini-pro-vision
-                    st.warning(f"Tentativa com modelo principal falhou: {e}. Tentando modelo de backup...")
-                    model_backup = genai.GenerativeModel('gemini-pro-vision')
-                    response = model_backup.generate_content([prompt, image_painel, image_cupom])
-                    st.code(response.text, language='markdown')
+            with st.spinner(f'Gerando relatório usando {active_model_name}...'):
+                response = model.generate_content([prompt, image_painel, image_cupom])
+                st.code(response.text, language='markdown')
 
         except Exception as e:
             st.error(f"Erro Fatal: {e}")
-            st.warning("Use o botão de Diagnóstico na barra lateral para ver quais modelos sua chave aceita.")
+            st.warning("Verifique se sua API Key tem permissões para usar o modelo selecionado.")

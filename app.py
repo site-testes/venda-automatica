@@ -228,6 +228,18 @@ if st.button("PROCESSAR DADOS"):
                                 alert('Erro ao copiar. Tente selecionar manualmente.');
                             }});
                         }}
+                        
+                        // Auto-scroll para o final da página
+                        setTimeout(function() {{
+                            try {{
+                                window.parent.window.scrollTo({{
+                                    top: window.parent.document.body.scrollHeight,
+                                    behavior: 'smooth'
+                                }});
+                            }} catch (e) {{
+                                console.log("Erro no auto-scroll:", e);
+                            }}
+                        }}, 500); // Pequeno delay para garantir que o DOM carregou
                     </script>
                     """,
                     height=60

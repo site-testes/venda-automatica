@@ -40,26 +40,15 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar Minimalista
+# --- CONFIGURAÇÃO DA API ---
+# A chave está definida aqui para não precisar digitar.
+# OBS: Em um projeto público real, o ideal é usar st.secrets, mas para seu uso pessoal direto no código funciona.
+API_KEY = "AIzaSyDsvskF4zhNeSs8W1D499_FR89wNPdOkr8"
+
+# Sidebar (Apenas título, sem inputs)
 with st.sidebar:
-    st.header("Configuração")
-    api_key = st.text_input("API Key", type="password")
-    
-    st.caption(f"Versão da Lib Google: {genai.__version__}")
-    
-    # DIAGNÓSTICO
-    if st.button("🔍 Diagnóstico de Erro"):
-        if not api_key:
-            st.error("Coloque a API Key primeiro.")
-        else:
-            try:
-                genai.configure(api_key=api_key)
-                st.write("Modelos Disponíveis para sua Chave:")
-                for m in genai.list_models():
-                    if 'generateContent' in m.supported_generation_methods:
-                        st.code(m.name)
-            except Exception as e:
-                st.error(f"Erro ao listar modelos: {e}")
+    st.header("Burger King")
+    st.info("Sistema Automático de Relatórios")
 
 # Layout Principal
 st.title("Relatório de Vendas")
@@ -82,48 +71,47 @@ st.markdown("---")
 
 # Botão de Ação Full Width
 if st.button("PROCESSAR DADOS"):
-    if not api_key:
-        st.error("API Key necessária.")
-    elif not uploaded_file_painel or not uploaded_file_cupom:
+    if not uploaded_file_painel or not uploaded_file_cupom:
         st.error("Imagens necessárias.")
     elif not meta_dia:
         st.error("Meta necessária.")
     else:
         try:
-            genai.configure(api_key=api_key)
+            genai.configure(api_key=API_KEY)
             
             # SELEÇÃO DINÂMICA DE MODELO
-            # Em vez de adivinhar, vamos perguntar pra API qual modelo ela tem.
             active_model_name = None
             
             try:
-                # Procura o primeiro modelo Flash ou Pro disponível na conta do usuário
-                for m in genai.list_models():
-                    if 'generateContent' in m.supported_generation_methods:
-                        if 'flash' in m.name.lower():
+                # Procura o primeiro modelo Flash ou Pro disponível na conta
+                # Prioridade: Flash -> Pro -> Qualquer um
+                models = genai.list_models()
+                
+                # 1. Tenta Flash
+                for m in models:
+                    if 'generateContent' in m.supported_generation_methods and 'flash' in m.name.lower():
+                        active_model_name = m.name
+                        break
+                
+                # 2. Tenta Pro (se não achou flash)
+                if not active_model_name:
+                    for m in models:
+                        if 'generateContent' in m.supported_generation_methods and 'pro' in m.name.lower():
                             active_model_name = m.name
                             break
                 
-                # Se não achou flash, tenta pro
+                # 3. Fallback genérico
                 if not active_model_name:
-                    for m in genai.list_models():
-                        if 'generateContent' in m.supported_generation_methods:
-                            if 'pro' in m.name.lower():
-                                active_model_name = m.name
-                                break
-                
-                # Se não achou nada específico, pega o primeiro que serve
-                if not active_model_name:
-                     for m in genai.list_models():
+                     for m in models:
                         if 'generateContent' in m.supported_generation_methods:
                             active_model_name = m.name
                             break
-            except Exception as e:
-                st.warning(f"Não foi possível listar modelos automaticamente: {e}. Tentando padrão...")
+            except Exception:
+                # Se falhar a listagem (ex: erro de rede), tenta o padrão hardcoded
                 active_model_name = 'gemini-1.5-flash'
 
             if not active_model_name:
-                st.error("Nenhum modelo compatível encontrado na sua conta Google.")
+                st.error("Erro: Nenhum modelo de IA disponível na sua conta.")
                 st.stop()
 
             model = genai.GenerativeModel(active_model_name)
@@ -175,10 +163,9 @@ if st.button("PROCESSAR DADOS"):
             Madrugada B ✅ D/I✅ D/C ✅ Contagem✅
             """
             
-            with st.spinner(f'Gerando relatório usando {active_model_name}...'):
+            with st.spinner(f'Gerando relatório...'):
                 response = model.generate_content([prompt, image_painel, image_cupom])
                 st.code(response.text, language='markdown')
 
         except Exception as e:
-            st.error(f"Erro Fatal: {e}")
-            st.warning("Verifique se sua API Key tem permissões para usar o modelo selecionado.")
+            st.error(f"Erro: {e}")

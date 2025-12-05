@@ -211,7 +211,8 @@ if st.button("PROCESSAR DADOS"):
             
             with st.spinner(f'Gerando relatório...'):
                 response = model.generate_content([prompt, image_painel, image_cupom])
-                text_output = response.text
+                # Limpeza do texto: remove os blocos de código markdown (```)
+                text_output = response.text.replace('```markdown', '').replace('```', '').strip()
                 
                 st.code(text_output, language='markdown')
                 
@@ -258,21 +259,24 @@ if st.button("PROCESSAR DADOS"):
                             }});
                         }}
                         
-                        // Auto-scroll para o final da página
+                        // Auto-scroll mais agressivo
                         function scrollToBottom() {{
                             try {{
-                                window.parent.window.scrollTo({{
-                                    top: 999999, // Força ir para o final absoluto
-                                    behavior: 'smooth'
-                                }});
+                                // Tenta rolar o elemento HTML principal do pai
+                                window.parent.document.documentElement.scrollTop = 999999;
+                                // Tenta rolar o corpo do pai
+                                window.parent.document.body.scrollTop = 999999;
+                                // Tenta o método padrão de janela
+                                window.parent.window.scrollTo(0, 999999);
                             }} catch (e) {{
                                 console.log("Erro no auto-scroll:", e);
                             }}
                         }}
                         
-                        // Tenta algumas vezes para garantir que o layout carregou
-                        setTimeout(scrollToBottom, 300);
-                        setTimeout(scrollToBottom, 800);
+                        // Executa várias vezes para garantir
+                        setTimeout(scrollToBottom, 100);
+                        setTimeout(scrollToBottom, 500);
+                        setTimeout(scrollToBottom, 1000);
                     </script>
                     """,
                     height=60

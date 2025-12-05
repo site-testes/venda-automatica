@@ -49,15 +49,14 @@ st.markdown("""
     [data-testid="stStatusWidget"] {display:none;}
     div[class*="viewerBadge"] {display: none;}
     
-    /* Forçar remoção de qualquer footer ou badge extra */
+    /* Forçar remoção de footer e header */
     footer {display: none !important;}
     #MainMenu {display: none !important;}
     header {display: none !important;}
     div[data-testid="stToolbar"] {display: none !important;}
     div[class^="viewerBadge"] {display: none !important;}
-    div[class^="st-emotion-cache"] {display: none !important;} /* Cuidado com este, pode ser genérico demais, mas vamos tentar focar no footer se possível */
     
-    /* Tentar esconder pelo texto ou posição se possível (CSS não permite seleção por texto, mas podemos tentar seletores de atributos mais genéricos) */
+    /* Tentar esconder pelo texto ou posição se possível */
     [data-testid="stFooter"] {display: none !important;}
 </style>
 """, unsafe_allow_html=True)

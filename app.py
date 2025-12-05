@@ -4,6 +4,7 @@ from PIL import Image
 import os
 import streamlit.components.v1 as components
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Carregar variáveis de ambiente
 load_dotenv()
@@ -112,6 +113,9 @@ if st.button("PROCESSAR DADOS"):
             image_painel = Image.open(uploaded_file_painel)
             image_cupom = Image.open(uploaded_file_cupom)
             
+            # Data atual formatada
+            data_atual = datetime.now().strftime("%d/%m/%Y")
+            
             prompt = f"""
             # Role (Papel)
             Você é um assistente especializado em auditoria de vendas do Burger King. Sua função é analisar imagens de relatórios operacionais e gerar um resumo de turno formatado para WhatsApp.
@@ -121,6 +125,7 @@ if st.button("PROCESSAR DADOS"):
             1. Uma imagem de um "Cupom Fiscal/Relatório de Fechamento" (fundo branco, lista de valores).
             2. Uma imagem da tela "METAS DO DIA" (fundo branco/laranja, com barras de progresso).
             3. Um valor numérico fornecido pelo usuário que representa a "Meta de Venda do Dia" (Projetado): {meta_dia}
+            4. A Data de Hoje é: {data_atual}
 
             # Instruções de Processamento (Passo a Passo)
 
@@ -155,12 +160,12 @@ if st.button("PROCESSAR DADOS"):
             - O Projetado (P) da categoria "Venda" é o valor numérico fornecido pelo usuário no input de texto ({meta_dia}).
 
             ## PASSO 5: Formatação de Saída
-            Gere a resposta APENAS com o bloco de código abaixo, sem adicionar introduções ou conclusões. Mantenha a formatação exata para que o alinhamento funcione no WhatsApp (bloco de código). Use a data de hoje.
+            Gere a resposta APENAS com o bloco de código abaixo, sem adicionar introduções ou conclusões. Mantenha a formatação exata para que o alinhamento funcione no WhatsApp (bloco de código).
             
             ### TEMPLATE DE SAÍDA OBRIGATÓRIO
             *Drive - W.L*
 
-            [DATA ATUAL DD/MM/AAAA]
+            {data_atual}
 
             *Venda*
             P: {meta_dia}

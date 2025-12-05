@@ -59,6 +59,9 @@ st.markdown("""
     /* Tentar esconder pelo texto ou posição se possível */
     [data-testid="stFooter"] {display: none !important;}
 </style>
+
+<!-- Tarja para cobrir o rodapé caso o CSS falhe -->
+<div style="position: fixed; bottom: 0; left: 0; width: 100%; height: 35px; background-color: #0e1117; z-index: 999999; pointer-events: none;"></div>
 """, unsafe_allow_html=True)
 
 # --- CONFIGURAÇÃO DA API ---

@@ -113,20 +113,49 @@ if st.button("PROCESSAR DADOS"):
             image_cupom = Image.open(uploaded_file_cupom)
             
             prompt = f"""
-            Você é um assistente especializado em gerar relatórios de vendas do Burger King.
-            
-            Abaixo estão duas imagens:
-            1. Foto do Painel de Metas.
-            2. Foto do Cupom Fiscal.
-            
-            A Meta do Dia digitada pelo usuário é: {meta_dia}
-            
-            --- REGRAS DE NEGÓCIO ---
-            1. Analise a 'Foto do Cupom Fiscal': Encontre o valor TOTAL da venda. Subtraia 13% desse valor. O resultado é o 'R' (Realizado) da Venda.
-            2. Analise a 'Foto do Painel de Metas': Extraia o 'Itens Vendidos' (R) e a 'Meta' (P) de: Premium, Cupons, Kids.
-            3. Extraia as porcentagens (%) de 'Combagem' e 'KingEmDobro'.
-            4. Sobremesa: O 'P' (Projetado) é SEMPRE 100. O 'R' (Realizado) deve ser preenchido sempre com "???".
-            5. A Saída deve ser APENAS a tabela abaixo, dentro de um bloco de código markdown, sem explicações extras.
+            # Role (Papel)
+            Você é um assistente especializado em auditoria de vendas do Burger King. Sua função é analisar imagens de relatórios operacionais e gerar um resumo de turno formatado para WhatsApp.
+
+            # Inputs (Entradas)
+            Você receberá:
+            1. Uma imagem de um "Cupom Fiscal/Relatório de Fechamento" (fundo branco, lista de valores).
+            2. Uma imagem da tela "METAS DO DIA" (fundo branco/laranja, com barras de progresso).
+            3. Um valor numérico fornecido pelo usuário que representa a "Meta de Venda do Dia" (Projetado): {meta_dia}
+
+            # Instruções de Processamento (Passo a Passo)
+
+            ## PASSO 1: Identificação das Imagens
+            Analise as duas imagens fornecidas e identifique qual é qual, independentemente da ordem de envio.
+            - Imagem A (Relatório): Contém textos como "LOJA", "DRIVE", "TOTEM", "TOTAL" e valores monetários.
+            - Imagem B (Metas): Contém o título "METAS DO DIA" e itens como "premium", "cupomfisico", "kids", "combagem", "kingemdobro".
+
+            ## PASSO 2: Extração e Cálculo da Venda (Imagem A)
+            1. Na Imagem A, localize a linha final ou o bloco que contém o valor "TOTAL" geral das vendas (geralmente o maior valor numérico no rodapé ou na coluna da direita).
+            2. Pegue esse valor TOTAL BRUTO.
+            3. APLIQUE A REGRA DE DESCONTO: Subtraia exatamente 13% desse valor total.
+               - Fórmula: `Valor_Realizado = Total_Bruto - (Total_Bruto * 0.13)`
+            4. Arredonde o resultado para duas casas decimais. Este será o valor "R" (Realizado) da Venda.
+
+            ## PASSO 3: Extração dos Itens (Imagem B)
+            Na Imagem B, extraia os valores numéricos para cada categoria. Atenção:
+            - "P" (Projetado/Meta): É o número que aparece à direita, na coluna "Meta".
+            - "R" (Realizado/Atingido): É o número que aparece dentro ou ao lado da barra colorida (laranja/verde) na coluna "Itens vendidos".
+
+            Extraia os dados para:
+            - Premium
+            - Cupons (pode aparecer como "cupomfisico")
+            - Kids
+            - Combagem (Este valor é uma porcentagem %)
+            - King em Dobro (Este valor é uma porcentagem %)
+
+            ## PASSO 4: Regras Fixas (Hardcoded)
+            - Para o item "Sobremesa":
+              - O Projetado (P) é SEMPRE: 100
+              - O Realizado (R) é SEMPRE: ??? (três interrogações).
+            - O Projetado (P) da categoria "Venda" é o valor numérico fornecido pelo usuário no input de texto ({meta_dia}).
+
+            ## PASSO 5: Formatação de Saída
+            Gere a resposta APENAS com o bloco de código abaixo, sem adicionar introduções ou conclusões. Mantenha a formatação exata para que o alinhamento funcione no WhatsApp (bloco de código). Use a data de hoje.
             
             ### TEMPLATE DE SAÍDA OBRIGATÓRIO
             *Drive - W.L*
@@ -135,27 +164,27 @@ if st.button("PROCESSAR DADOS"):
 
             *Venda*
             P: {meta_dia}
-            R: [Valor do Cupom - 13%]
+            R: [Valor Calculado no Passo 2]
 
             *cupons*
-            P: [Meta extraída da foto]
-            R: [Realizado extraído da foto]
+            P: [Meta extraída]
+            R: [Realizado extraído]
 
             *Premium*
-            P: [Meta extraída da foto]
-            R: [Realizado extraído da foto]
+            P: [Meta extraída]
+            R: [Realizado extraído]
 
             *kids*
-            P: [Meta extraída da foto]
-            R: [Realizado extraído da foto]
+            P: [Meta extraída]
+            R: [Realizado extraído]
 
             *Combagem*
-            P: [Meta extraída da foto]%
-            R: [Realizado extraído da foto]%
+            P: [Meta extraída]%
+            R: [Realizado extraído]%
 
             *kingemdobro*
-            P: [Meta extraída da foto]%
-            R: [Realizado extraído da foto]%
+            P: [Meta extraída]%
+            R: [Realizado extraído]%
 
             *Sobremesa*
             P: 100
@@ -230,16 +259,20 @@ if st.button("PROCESSAR DADOS"):
                         }}
                         
                         // Auto-scroll para o final da página
-                        setTimeout(function() {{
+                        function scrollToBottom() {{
                             try {{
                                 window.parent.window.scrollTo({{
-                                    top: window.parent.document.body.scrollHeight,
+                                    top: 999999, // Força ir para o final absoluto
                                     behavior: 'smooth'
                                 }});
                             }} catch (e) {{
                                 console.log("Erro no auto-scroll:", e);
                             }}
-                        }}, 500); // Pequeno delay para garantir que o DOM carregou
+                        }}
+                        
+                        // Tenta algumas vezes para garantir que o layout carregou
+                        setTimeout(scrollToBottom, 300);
+                        setTimeout(scrollToBottom, 800);
                     </script>
                     """,
                     height=60

@@ -81,10 +81,26 @@ with st.container():
     
     with col2:
         col_up1, col_up2 = st.columns(2)
+        
         with col_up1:
-            uploaded_file_painel = st.file_uploader("Painel de Metas", type=["jpg", "png", "jpeg"])
+            st.markdown("###### Painel de Metas")
+            tab_cam1, tab_up1 = st.tabs(["📸 Câmera", "📂 Galeria"])
+            with tab_cam1:
+                img_painel_cam = st.camera_input("Foto Painel", label_visibility="collapsed")
+            with tab_up1:
+                img_painel_up = st.file_uploader("Upload Painel", type=["jpg", "png", "jpeg"], label_visibility="collapsed")
+            
+            uploaded_file_painel = img_painel_cam if img_painel_cam else img_painel_up
+
         with col_up2:
-            uploaded_file_cupom = st.file_uploader("Cupom Fiscal", type=["jpg", "png", "jpeg"])
+            st.markdown("###### Cupom Fiscal")
+            tab_cam2, tab_up2 = st.tabs(["📸 Câmera", "📂 Galeria"])
+            with tab_cam2:
+                img_cupom_cam = st.camera_input("Foto Cupom", label_visibility="collapsed")
+            with tab_up2:
+                img_cupom_up = st.file_uploader("Upload Cupom", type=["jpg", "png", "jpeg"], label_visibility="collapsed")
+            
+            uploaded_file_cupom = img_cupom_cam if img_cupom_cam else img_cupom_up
 
 st.markdown("---")
 

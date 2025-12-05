@@ -136,31 +136,55 @@ if st.button("PROCESSAR DADOS"):
             5. A Saída deve ser APENAS a tabela abaixo, dentro de um bloco de código markdown, sem explicações extras.
             
             ### TEMPLATE DE SAÍDA OBRIGATÓRIO
-            Drive - W.L
+            *Drive - W.L*
 
             [DATA ATUAL DD/MM/AAAA]
 
-            Venda P: {meta_dia} R: [Valor do Cupom - 13%]
+            *Venda*
+            P: {meta_dia}
+            R: [Valor do Cupom - 13%]
 
-            Premium P: [Meta extraída da foto] R: [Realizado extraído da foto]
+            *cupons*
+            P: [Meta extraída da foto]
+            R: [Realizado extraído da foto]
 
-            cupons P: [Meta extraída da foto] R: [Realizado extraído da foto]
+            *Premium*
+            P: [Meta extraída da foto]
+            R: [Realizado extraído da foto]
 
-            kids P: [Meta extraída da foto] R: [Realizado extraído da foto]
+            *kids*
+            P: [Meta extraída da foto]
+            R: [Realizado extraído da foto]
 
-            Combagem P: [Meta extraída da foto]% R: [Realizado extraído da foto]%
+            *Combagem*
+            P: [Meta extraída da foto]%
+            R: [Realizado extraído da foto]%
 
-            kingemdobro P: [Meta extraída da foto]% R: [Realizado extraído da foto]%
+            *kingemdobro*
+            P: [Meta extraída da foto]%
+            R: [Realizado extraído da foto]%
 
-            Sobremesa P: 100 R: ???
+            *Sobremesa*
+            P: 100
+            R: ???
 
-            Lançamentos
+            *Lançamentos*
 
-            Dia B ✅ D/C ✅ D/I ✅
+            *Dia*
+            B ✅
+            D/C ✅
+            D/I ✅
 
-            Noite B ✅ D/C ✅ D/I ✅
+            *Noite*
+            B ✅
+            D/C ✅
+            D/I ✅
 
-            Madrugada B ✅ D/I✅ D/C ✅ Contagem✅
+            *Madrugada*
+            B ✅
+            D/I✅
+            D/C ✅
+            Contagem✅
             """
             
             with st.spinner(f'Gerando relatório...'):

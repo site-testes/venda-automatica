@@ -42,6 +42,12 @@ st.markdown("""
     header {visibility: hidden;}
     [data-testid="stToolbar"] {visibility: hidden;}
     .stApp > header {display: none;}
+    
+    /* Esconder botões flutuantes inferiores (Deploy, Status, etc) */
+    .stDeployButton {display:none;}
+    [data-testid="stDecoration"] {display:none;}
+    [data-testid="stStatusWidget"] {display:none;}
+    div[class*="viewerBadge"] {display: none;}
 </style>
 """, unsafe_allow_html=True)
 

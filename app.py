@@ -145,6 +145,10 @@ if st.button("PROCESSAR DADOS"):
             Na Imagem B, extraia os valores numéricos para cada categoria. Atenção:
             - "P" (Projetado/Meta): É o número que aparece à direita, na coluna "Meta".
             - "R" (Realizado/Atingido): É o número que aparece dentro ou ao lado da barra colorida (laranja/verde) na coluna "Itens vendidos".
+            
+            **REGRA VISUAL IMPORTANTE:**
+            - Se a barra de progresso ou o círculo indicador estiver na cor **CINZA** (sem preenchimento laranja/amarelo), o valor Realizado (R) é **0** (zero).
+            - Exemplo: Se "kids" tem um círculo cinza, R = 0.
 
             Extraia os dados para:
             - Premium

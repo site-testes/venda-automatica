@@ -189,14 +189,7 @@ if st.button("PROCESSAR DADOS"):
             
             with st.spinner(f'Gerando relatório...'):
                 response = model.generate_content([prompt, image_painel, image_cupom])
-                text_output = response.text
-                
-                # Exibe como código (bonito e com botão de copiar no desktop)
-                st.code(text_output, language='markdown')
-                
-                # Exibe como área de texto (melhor para selecionar tudo no celular)
-                st.markdown("### 📱 Copiar para WhatsApp")
-                st.text_area("Toque dentro, selecione tudo e copie:", value=text_output, height=400)
+                st.code(response.text, language='markdown')
 
         except Exception as e:
             st.error(f"Erro: {e}")

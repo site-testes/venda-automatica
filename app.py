@@ -39,6 +39,9 @@ st.markdown("""
     /* Esconder menu padrão do Streamlit para visual mais limpo */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    header {visibility: hidden;}
+    [data-testid="stToolbar"] {visibility: hidden;}
+    .stApp > header {display: none;}
 </style>
 """, unsafe_allow_html=True)
 

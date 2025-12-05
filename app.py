@@ -59,29 +59,15 @@ st.markdown("""
     /* Tentar esconder pelo texto ou posição se possível */
     [data-testid="stFooter"] {display: none !important;}
 
-    /* TRADUÇÃO DO UPLOAD DE ARQUIVO */
-    [data-testid='stFileUploader'] {
-        width: max-content;
-    }
-    [data-testid='stFileUploader'] section {
-        padding: 0;
-        float: left;
-    }
-    [data-testid='stFileUploader'] section > input + div {
-        display: none;
-    }
-    [data-testid='stFileUploader'] section + div {
-        float: right;
-        padding-top: 0;
-    }
-
+    /* TRADUÇÃO DO UPLOAD DE ARQUIVO (Apenas Texto) */
+    
     /* Esconde o texto original "Drag and drop file here" e "Limit 200MB" */
     [data-testid="stFileUploader"] section > div:first-child > div:first-child {
         color: transparent;
     }
     [data-testid="stFileUploader"] section > div:first-child > div:first-child::before {
         content: "Arraste e solte o arquivo aqui";
-        color: white;
+        color: white; /* Cor do texto */
         position: absolute;
         top: 0;
         left: 0;
@@ -91,6 +77,7 @@ st.markdown("""
         align-items: center;
         justify-content: center;
         font-weight: bold;
+        pointer-events: none; /* Garante que o clique passe para o input */
     }
 
     /* Traduz o botão "Browse files" */
@@ -105,6 +92,7 @@ st.markdown("""
         right: 0;
         margin: auto;
         font-weight: 600;
+        pointer-events: none;
     }
     
     /* Tenta esconder o texto de limite */

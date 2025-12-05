@@ -58,28 +58,6 @@ st.markdown("""
     
     /* Tentar esconder pelo texto ou posição se possível */
     [data-testid="stFooter"] {display: none !important;}
-
-    /* TRADUÇÃO DO BOTÃO BROWSE FILES (CSS HACK) */
-    [data-testid="stFileUploader"] label {
-        font-size: 16px;
-        font-weight: bold;
-    }
-    [data-testid="stFileUploader"] button {
-        display: none;
-    }
-    /* Isso esconde o texto original "Browse files" e coloca "Procurar" */
-    section[data-testid="stFileUploader"] div[data-testid="stBaseButton-secondary"] {
-        color: transparent !important;
-    }
-    section[data-testid="stFileUploader"] div[data-testid="stBaseButton-secondary"]::after {
-        content: "📂 Procurar Arquivo";
-        color: white;
-        position: absolute;
-        left: 0;
-        right: 0;
-        margin: auto;
-        font-weight: 600;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -105,38 +83,9 @@ with st.container():
         col_up1, col_up2 = st.columns(2)
         
         with col_up1:
-            st.markdown("###### Painel de Metas")
-            # Toggle para escolher método
-            metodo_painel = st.radio(
-                "Método Painel", 
-                ["📂 Galeria", "📸 Câmera"], 
-                horizontal=True, 
-                label_visibility="collapsed",
-                key="radio_painel"
-            )
-            
-            if metodo_painel == "📸 Câmera":
-                img_painel_cam = st.camera_input("Foto Painel", label_visibility="collapsed", key="cam_painel")
-                uploaded_file_painel = img_painel_cam
-            else:
-                uploaded_file_painel = st.file_uploader("Upload Painel", type=["jpg", "png", "jpeg"], label_visibility="collapsed", key="up_painel")
-
+            uploaded_file_painel = st.file_uploader("Painel de Metas", type=["jpg", "png", "jpeg"])
         with col_up2:
-            st.markdown("###### Cupom Fiscal")
-            # Toggle para escolher método
-            metodo_cupom = st.radio(
-                "Método Cupom", 
-                ["📂 Galeria", "📸 Câmera"], 
-                horizontal=True, 
-                label_visibility="collapsed",
-                key="radio_cupom"
-            )
-            
-            if metodo_cupom == "📸 Câmera":
-                img_cupom_cam = st.camera_input("Foto Cupom", label_visibility="collapsed", key="cam_cupom")
-                uploaded_file_cupom = img_cupom_cam
-            else:
-                uploaded_file_cupom = st.file_uploader("Upload Cupom", type=["jpg", "png", "jpeg"], label_visibility="collapsed", key="up_cupom")
+            uploaded_file_cupom = st.file_uploader("Cupom Fiscal", type=["jpg", "png", "jpeg"])
 
 st.markdown("---")
 

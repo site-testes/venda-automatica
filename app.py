@@ -191,7 +191,7 @@ if st.button("PROCESSAR DADOS"):
                 js_text = text_output.replace('`', '\\`').replace('$', '\\$').replace('\\n', '\\\\n').replace("'", "\\'")
                 
                 components.html(
-                    f\"\"\"
+                    f"""
                     <style>
                         .copy-btn {{
                             width: 100%;
@@ -229,7 +229,7 @@ if st.button("PROCESSAR DADOS"):
                             }});
                         }}
                     </script>
-                    \"\"\",
+                    """,
                     height=60
                 )
 

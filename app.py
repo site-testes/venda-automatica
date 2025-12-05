@@ -58,6 +58,59 @@ st.markdown("""
     
     /* Tentar esconder pelo texto ou posição se possível */
     [data-testid="stFooter"] {display: none !important;}
+
+    /* TRADUÇÃO DO UPLOAD DE ARQUIVO */
+    [data-testid='stFileUploader'] {
+        width: max-content;
+    }
+    [data-testid='stFileUploader'] section {
+        padding: 0;
+        float: left;
+    }
+    [data-testid='stFileUploader'] section > input + div {
+        display: none;
+    }
+    [data-testid='stFileUploader'] section + div {
+        float: right;
+        padding-top: 0;
+    }
+
+    /* Esconde o texto original "Drag and drop file here" e "Limit 200MB" */
+    [data-testid="stFileUploader"] section > div:first-child > div:first-child {
+        color: transparent;
+    }
+    [data-testid="stFileUploader"] section > div:first-child > div:first-child::before {
+        content: "Arraste e solte o arquivo aqui";
+        color: white;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    /* Traduz o botão "Browse files" */
+    [data-testid="stBaseButton-secondary"] {
+        color: transparent !important;
+    }
+    [data-testid="stBaseButton-secondary"]::after {
+        content: "📂 Procurar Arquivo";
+        color: white;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: auto;
+        font-weight: 600;
+    }
+    
+    /* Tenta esconder o texto de limite */
+    [data-testid="stFileUploader"] small {
+        display: none;
+    }
 </style>
 """, unsafe_allow_html=True)
 

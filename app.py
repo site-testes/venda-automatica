@@ -58,6 +58,47 @@ st.markdown("""
     
     /* Tentar esconder pelo texto ou posição se possível */
     [data-testid="stFooter"] {display: none !important;}
+
+    /* TRADUÇÃO DO UPLOAD DE ARQUIVO (Apenas Texto) */
+    
+    /* Esconde o texto original "Drag and drop file here" e "Limit 200MB" */
+    [data-testid="stFileUploader"] section > div:first-child > div:first-child {
+        color: transparent;
+    }
+    [data-testid="stFileUploader"] section > div:first-child > div:first-child::before {
+        content: "Arraste e solte o arquivo aqui";
+        color: white; /* Cor do texto */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        pointer-events: none; /* Garante que o clique passe para o input */
+    }
+
+    /* Traduz o botão "Browse files" */
+    [data-testid="stBaseButton-secondary"] {
+        color: transparent !important;
+    }
+    [data-testid="stBaseButton-secondary"]::after {
+        content: "📂 Procurar Arquivo";
+        color: white;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: auto;
+        font-weight: 600;
+        pointer-events: none;
+    }
+    
+    /* Tenta esconder o texto de limite */
+    [data-testid="stFileUploader"] small {
+        display: none;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -85,7 +126,7 @@ with st.container():
         with col_up1:
             uploaded_file_painel = st.file_uploader("Painel de Metas", type=["jpg", "png", "jpeg"])
         with col_up2:
-            uploaded_file_cupom = st.file_uploader("Venda do Dia", type=["jpg", "png", "jpeg"])
+            uploaded_file_cupom = st.file_uploader("Cupom Fiscal", type=["jpg", "png", "jpeg"])
 
 st.markdown("---")
 
@@ -288,24 +329,22 @@ if st.button("PROCESSAR DADOS"):
                             }});
                         }}
                         
-                        // Auto-scroll mais agressivo
+                        // Auto-scroll suave
                         function scrollToBottom() {{
                             try {{
-                                // Tenta rolar o elemento HTML principal do pai
-                                window.parent.document.documentElement.scrollTop = 999999;
-                                // Tenta rolar o corpo do pai
-                                window.parent.document.body.scrollTop = 999999;
-                                // Tenta o método padrão de janela
-                                window.parent.window.scrollTo(0, 999999);
+                                window.parent.window.scrollTo({{
+                                    top: window.parent.document.body.scrollHeight,
+                                    behavior: 'smooth'
+                                }});
                             }} catch (e) {{
                                 console.log("Erro no auto-scroll:", e);
                             }}
                         }}
                         
-                        // Executa várias vezes para garantir
-                        setTimeout(scrollToBottom, 100);
-                        setTimeout(scrollToBottom, 500);
-                        setTimeout(scrollToBottom, 1000);
+                        // Executa com intervalos maiores para garantir que o render terminou
+                        setTimeout(scrollToBottom, 300);
+                        setTimeout(scrollToBottom, 800);
+                        setTimeout(scrollToBottom, 1500);
                     </script>
                     """,
                     height=60
@@ -313,4 +352,3 @@ if st.button("PROCESSAR DADOS"):
 
         except Exception as e:
             st.error(f"Erro: {e}")
-

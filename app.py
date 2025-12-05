@@ -2,6 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 import os
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
 # Carregar variáveis de ambiente
@@ -41,8 +42,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- CONFIGURAÇÃO DA API ---
-# A chave está definida aqui para não precisar digitar.
-# OBS: Em um projeto público real, o ideal é usar st.secrets, mas para seu uso pessoal direto no código funciona.
 API_KEY = "AIzaSyDsvskF4zhNeSs8W1D499_FR89wNPdOkr8"
 
 # Sidebar (Apenas título, sem inputs)
@@ -53,7 +52,7 @@ with st.sidebar:
 # Layout Principal
 st.title("Relatório de Vendas")
 
-# Container para Inputs (Responsivo: em mobile fica um abaixo do outro)
+# Container para Inputs
 with st.container():
     col1, col2 = st.columns([1, 2])
     
@@ -83,31 +82,25 @@ if st.button("PROCESSAR DADOS"):
             active_model_name = None
             
             try:
-                # Procura o primeiro modelo Flash ou Pro disponível na conta
-                # Prioridade: Flash -> Pro -> Qualquer um
                 models = genai.list_models()
-                
                 # 1. Tenta Flash
                 for m in models:
                     if 'generateContent' in m.supported_generation_methods and 'flash' in m.name.lower():
                         active_model_name = m.name
                         break
-                
-                # 2. Tenta Pro (se não achou flash)
+                # 2. Tenta Pro
                 if not active_model_name:
                     for m in models:
                         if 'generateContent' in m.supported_generation_methods and 'pro' in m.name.lower():
                             active_model_name = m.name
                             break
-                
-                # 3. Fallback genérico
+                # 3. Fallback
                 if not active_model_name:
                      for m in models:
                         if 'generateContent' in m.supported_generation_methods:
                             active_model_name = m.name
                             break
             except Exception:
-                # Se falhar a listagem (ex: erro de rede), tenta o padrão hardcoded
                 active_model_name = 'gemini-1.5-flash'
 
             if not active_model_name:
@@ -189,7 +182,56 @@ if st.button("PROCESSAR DADOS"):
             
             with st.spinner(f'Gerando relatório...'):
                 response = model.generate_content([prompt, image_painel, image_cupom])
-                st.code(response.text, language='markdown')
+                text_output = response.text
+                
+                st.code(text_output, language='markdown')
+                
+                # Botão de Copiar Customizado (HTML/JS)
+                # Escapando caracteres para evitar quebra do JS
+                js_text = text_output.replace('`', '\\`').replace('$', '\\$').replace('\\n', '\\\\n').replace("'", "\\'")
+                
+                components.html(
+                    f\"\"\"
+                    <style>
+                        .copy-btn {{
+                            width: 100%;
+                            background-color: #d62300;
+                            color: white;
+                            border-radius: 8px;
+                            height: 50px;
+                            font-weight: 600;
+                            border: none;
+                            cursor: pointer;
+                            font-family: "Source Sans Pro", sans-serif;
+                            font-size: 16px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }}
+                        .copy-btn:hover {{
+                            background-color: #b51d00;
+                        }}
+                        .copy-btn:active {{
+                            background-color: #901700;
+                        }}
+                    </style>
+                    <button class="copy-btn" onclick="copyToClipboard()">📋 COPIAR RELATÓRIO</button>
+                    <script>
+                        function copyToClipboard() {{
+                            const text = `{js_text}`;
+                            navigator.clipboard.writeText(text).then(function() {{
+                                const btn = document.querySelector('.copy-btn');
+                                btn.innerText = '✅ COPIADO!';
+                                setTimeout(() => {{ btn.innerText = '📋 COPIAR RELATÓRIO'; }}, 2000);
+                            }}, function(err) {{
+                                console.error('Erro ao copiar: ', err);
+                                alert('Erro ao copiar. Tente selecionar manualmente.');
+                            }});
+                        }}
+                    </script>
+                    \"\"\",
+                    height=60
+                )
 
         except Exception as e:
             st.error(f"Erro: {e}")

@@ -85,7 +85,7 @@ with st.container():
         with col_up1:
             uploaded_file_painel = st.file_uploader("Painel de Metas", type=["jpg", "png", "jpeg"])
         with col_up2:
-            uploaded_file_cupom = st.file_uploader("Cupom Fiscal", type=["jpg", "png", "jpeg"])
+            uploaded_file_cupom = st.file_uploader("Venda do Dia", type=["jpg", "png", "jpeg"])
 
 st.markdown("---")
 
@@ -313,3 +313,4 @@ if st.button("PROCESSAR DADOS"):
 
         except Exception as e:
             st.error(f"Erro: {e}")
+

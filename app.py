@@ -62,7 +62,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- CONFIGURAÇÃO DA API ---
-API_KEY = "AIzaSyDsvskF4zhNeSs8W1D499_FR89wNPdOkr8"
+API_KEY = ""
 
 # Sidebar (Apenas título, sem inputs)
 with st.sidebar:
@@ -313,3 +313,4 @@ if st.button("PROCESSAR DADOS"):
 
         except Exception as e:
             st.error(f"Erro: {e}")
+
